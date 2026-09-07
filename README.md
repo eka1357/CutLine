@@ -120,6 +120,20 @@ python tests/run_phase2_test.py
 python tests/test_api_endpoint.py
 ```
 
+## Google Cloud Run Deployment
+
+CutLine includes a multi-stage `Dockerfile` that packages both the built React frontend and the FastAPI backend into a single container:
+
+```bash
+# Deploy directly to Cloud Run using Google Cloud Build
+gcloud run deploy cutline \
+  --source . \
+  --region us-central1 \
+  --platform managed \
+  --allow-unauthenticated \
+  --set-env-vars GEMINI_API_KEY="your-gemini-key",PARALLEL_API_KEY="your-parallel-key",GEMINI_MODEL="gemini-3.6-flash"
+```
+
 ---
 
 ## License
