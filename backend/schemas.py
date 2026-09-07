@@ -79,6 +79,18 @@ class ResearchFact(BaseModel):
     source_url: str = Field(
         description="Exact HTTP(S) URL where this fact was retrieved."
     )
+    source_title: str = Field(
+        default="",
+        description="Title of the source webpage or publication."
+    )
+    source_domain: str = Field(
+        default="",
+        description="Domain name of the source (e.g., santamonica.gov, film.ca.gov)."
+    )
+    evidence_text: str = Field(
+        default="",
+        description="Exact excerpt passage from Parallel search results supporting this claim."
+    )
     category: ResearchCategoryType = Field(
         description="One of the exactly 5 authorized research categories."
     )
@@ -96,6 +108,14 @@ class ResearchResult(BaseModel):
     total_facts: int
     category_counts: dict[str, int]
     facts: list[ResearchFact]
+    failed_categories: list[str] = Field(
+        default_factory=list,
+        description="List of categories where Parallel search failed or yielded no results."
+    )
+    category_errors: dict[str, str] = Field(
+        default_factory=dict,
+        description="Error messages for any category search that encountered API/network exceptions."
+    )
 
 
 # -----------------------------------------------------------------------------

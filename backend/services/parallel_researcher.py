@@ -15,6 +15,27 @@ from backend.schemas import ResearchFact, ResearchResult, ResearchCategoryType
 logger = logging.getLogger("cutline.parallel_researcher")
 
 
+import urllib.parse
+
+# Common boilerplate phrases found in raw web page headers/navigation
+BOILERPLATE_PATTERNS = [
+    r"skip to main content",
+    r"sign in",
+    r"terms of service",
+    r"privacy policy",
+    r"cookie policy",
+    r"all rights reserved",
+    r"menu \u2715",
+    r"search form search",
+]
+
+
+def is_boilerplate(text: str) -> bool:
+    """Detect and filter out web navigation/header chrome."""
+    lower = text.lower()
+    return any(re.search(pat, lower) for pat in BOILERPLATE_PATTERNS)
+
+
 def clean_excerpt_text(text: str) -> str:
     """Clean markdown formatting and newlines from raw excerpts for clear claim presentation."""
     cleaned = re.sub(r"#+\s*", "", text)
@@ -24,28 +45,43 @@ def clean_excerpt_text(text: str) -> str:
 
 
 def extract_claims_from_excerpt(
-    raw_excerpt: str, source_url: str, category: ResearchCategoryType, max_claims: int = 2
+    raw_excerpt: str,
+    source_url: str,
+    source_title: str,
+    category: ResearchCategoryType,
+    max_claims: int = 2,
 ) -> list[ResearchFact]:
     """
     Extracts concrete factual claims directly from Parallel excerpts,
-    preserving exact URL provenance.
+    filtering navigation boilerplate and preserving full source provenance.
     """
     facts: list[ResearchFact] = []
     paragraphs = [p.strip() for p in raw_excerpt.split("\n\n") if len(p.strip()) > 30]
 
-    for paragraph in paragraphs[:max_claims]:
+    domain = urllib.parse.urlparse(source_url).netloc
+
+    for paragraph in paragraphs:
+        if is_boilerplate(paragraph):
+            continue
+
         cleaned = clean_excerpt_text(paragraph)
-        if len(cleaned) > 20:
-            # Shorten if too verbose while keeping the factual meat
-            claim_text = cleaned if len(cleaned) <= 320 else cleaned[:317] + "..."
-            facts.append(
-                ResearchFact(
-                    claim=claim_text,
-                    source_url=source_url,
-                    category=category,
-                    relevance_summary=f"Discovered via Parallel Search in category: {category}",
-                )
+        if len(cleaned) < 25:
+            continue
+
+        claim_text = cleaned if len(cleaned) <= 320 else cleaned[:317] + "..."
+        facts.append(
+            ResearchFact(
+                claim=claim_text,
+                source_url=source_url,
+                source_title=source_title,
+                source_domain=domain,
+                evidence_text=cleaned,
+                category=category,
+                relevance_summary=f"Retrieved from {domain} via Parallel Search in category '{category}'",
             )
+        )
+        if len(facts) >= max_claims:
+            break
 
     return facts
 
@@ -57,9 +93,10 @@ def research_category(
     shoot_start_date: str,
     shoot_end_date: str,
     location_types: list[str],
-) -> list[ResearchFact]:
+) -> tuple[list[ResearchFact], Optional[str]]:
     """
     Executes a targeted search for a single category using Parallel.search.
+    Returns (facts, error_message_if_failed). Never returns synthetic facts.
     """
     location_str = ", ".join(location_types) if location_types else "public locations"
 
@@ -104,39 +141,49 @@ def research_category(
                 continue
             seen_urls.add(url)
 
+            title = getattr(item, "title", "") or "Web Source"
+            domain = urllib.parse.urlparse(url).netloc
             excerpts = getattr(item, "excerpts", []) or []
-            if excerpts:
-                for exc in excerpts[:2]:
-                    extracted = extract_claims_from_excerpt(exc, url, category, max_claims=1)
-                    category_facts.extend(extracted)
-            else:
-                # If excerpts are empty, fall back to title as claim
-                title = getattr(item, "title", "Relevant filming source")
+
+            extracted_from_item = []
+            for exc in excerpts:
+                extracted = extract_claims_from_excerpt(
+                    raw_excerpt=exc,
+                    source_url=url,
+                    source_title=title,
+                    category=category,
+                    max_claims=1,
+                )
+                extracted_from_item.extend(extracted)
+                if len(extracted_from_item) >= 1:
+                    break
+
+            if extracted_from_item:
+                category_facts.extend(extracted_from_item)
+            elif title and not is_boilerplate(title):
+                # Only use title if no excerpts exist and title is non-boilerplate
                 category_facts.append(
                     ResearchFact(
-                        claim=f"{title}: verified source for {category} in {location}.",
+                        claim=f"{title} (filming authority/resource for {location})",
                         source_url=url,
+                        source_title=title,
+                        source_domain=domain,
+                        evidence_text=title,
                         category=category,
-                        relevance_summary="Retrieved via Parallel Search",
+                        relevance_summary=f"Retrieved from {domain} via Parallel Search",
                     )
                 )
 
             if len(category_facts) >= 3:
                 break
 
-    except Exception as e:
-        logger.error(f"Parallel Search failed for category '{category}': {e}")
-        # Return fallback fact indicating API communication status without failing whole run
-        category_facts.append(
-            ResearchFact(
-                claim=f"Search for {category} in {location} could not complete during live call ({type(e).__name__}).",
-                source_url="https://docs.parallel.ai",
-                category=category,
-                relevance_summary="Fallback fact on connection failure",
-            )
-        )
+        return category_facts, None
 
-    return category_facts
+    except Exception as e:
+        err_msg = f"Parallel Search failed for category '{category}': {e}"
+        logger.error(err_msg)
+        # CRITICAL RULE: Never generate synthetic facts. Return empty facts and record error.
+        return [], err_msg
 
 
 def run_parallel_research(
@@ -148,17 +195,21 @@ def run_parallel_research(
 ) -> ResearchResult:
     """
     Executes live Parallel searches across all 5 mandatory categories sequentially.
+    Never creates synthetic facts on failure.
     """
     client = Parallel(api_key=PARALLEL_API_KEY)
     all_facts: list[ResearchFact] = []
     category_counts: dict[str, int] = {}
+    failed_categories: list[str] = []
+    category_errors: dict[str, str] = {}
+
     categories_list = list(RESEARCH_CATEGORIES.keys())
 
     for idx, category in enumerate(categories_list, start=1):
         if progress_callback:
             progress_callback(category, idx, len(categories_list))
 
-        facts = research_category(
+        facts, error_msg = research_category(
             client=client,
             category=category,  # type: ignore
             location=location,
@@ -166,6 +217,12 @@ def run_parallel_research(
             shoot_end_date=shoot_end_date,
             location_types=location_types or [],
         )
+
+        if error_msg:
+            failed_categories.append(category)
+            category_errors[category] = error_msg
+        elif not facts:
+            failed_categories.append(category)
 
         all_facts.extend(facts)
         category_counts[category] = len(facts)
@@ -177,4 +234,6 @@ def run_parallel_research(
         total_facts=len(all_facts),
         category_counts=category_counts,
         facts=all_facts,
+        failed_categories=failed_categories,
+        category_errors=dict(category_errors) if isinstance(category_errors, dict) else {},
     )
