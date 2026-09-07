@@ -59,6 +59,33 @@ def test_phase1_analyze():
     print(" [PASS] /api/phase1/analyze returned 200 with full Phase 1 payload!")
 
 
+def test_pipeline_run():
+    print("\nTesting POST /api/pipeline/run (Master Pipeline Endpoint) ...")
+    payload = {
+        "screenplay": NEON_DRIFTWOOD_SCREENPLAY,
+        "location": TEST_LOCATION,
+        "shoot_start_date": TEST_START_DATE,
+        "shoot_end_date": TEST_END_DATE,
+        "budget": TEST_BUDGET,
+    }
+    response = client.post("/api/pipeline/run", json=payload)
+    assert response.status_code == 200, f"Pipeline run failed: {response.text}"
+    data = response.json()
+    assert "project_title" in data
+    assert data["overall_decision"] in ("GO", "RISK", "BLOCKED")
+    assert len(data["scenes"]) >= 2
+    assert len(data["all_evidence"]) > 0
+
+    scene_1 = next(s for s in data["scenes"] if "SCENE_1" in s["scene_id"])
+    assert scene_1["decision"] == "GO"
+
+    scene_2 = next(s for s in data["scenes"] if "SCENE_2" in s["scene_id"])
+    assert scene_2["decision"] in ("RISK", "BLOCKED")
+    assert len(scene_2["alternatives"]) >= 2
+    print(" [PASS] /api/pipeline/run returned 200 with full master ProductionPlan!")
+
+
 if __name__ == "__main__":
     test_health()
     test_phase1_analyze()
+    test_pipeline_run()
