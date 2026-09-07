@@ -77,7 +77,7 @@ export default function ProductionForm({
           >
             <div className="preset-card-header">
               <span className="preset-city">NEW YORK</span>
-              <span className="badge-tag" style={{ color: 'var(--status-risk)', borderColor: 'var(--status-risk-border)' }}>MANHATTAN</span>
+              <span className="badge-tag risk">MANHATTAN</span>
             </div>
             <div className="preset-title-text">Empire Lockdown</div>
             <div className="preset-desc-text">Brooklyn Bridge walkway, blank rounds, UN security</div>
