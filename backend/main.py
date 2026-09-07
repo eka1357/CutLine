@@ -8,8 +8,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import mask_secret, GEMINI_API_KEY, PARALLEL_API_KEY
-from backend.schemas import Phase1Request, Phase1Response
-from backend.pipeline import run_phase1_pipeline
+from backend.schemas import (
+    Phase1Request,
+    Phase1Response,
+    PipelineRequest,
+    ProductionPlan,
+)
+from backend.pipeline import run_phase1_pipeline, run_complete_pipeline
 
 # Configure logging
 logging.basicConfig(
@@ -62,4 +67,24 @@ def analyze_phase1(request: Phase1Request):
         return response
     except Exception as e:
         logger.exception("Error executing Phase 1 pipeline")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/pipeline/run", response_model=ProductionPlan)
+@app.post("/api/plan", response_model=ProductionPlan)
+def run_production_pipeline(request: PipelineRequest):
+    """
+    Master 5-Stage Production Planning Endpoint:
+    Runs Screenplay Breakdown -> Parallel Research -> Evidence Engine -> Decision Engine -> Rewrite Strategist.
+    Returns complete frontend-ready ProductionPlan with verified evidence provenance and alternatives.
+    """
+    try:
+        logger.info(
+            f"Starting complete production pipeline for '{request.location}' "
+            f"({request.shoot_start_date} to {request.shoot_end_date}) budget: ${request.budget:,.2f}"
+        )
+        plan = run_complete_pipeline(request)
+        return plan
+    except Exception as e:
+        logger.exception("Error executing master production pipeline")
         raise HTTPException(status_code=500, detail=str(e))
