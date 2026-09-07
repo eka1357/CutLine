@@ -32,11 +32,12 @@ This repository uses **Google Cloud Gemini** and **Parallel Search** actively at
 
 | Provider | SDK / Package | Runtime Calls in Code |
 | :--- | :--- | :--- |
-| **Google Cloud Gemini** | `google-genai` (v2.22.0+) | [`backend/services/gemini_analyzer.py`](backend/services/gemini_analyzer.py) (Line 50: `client.models.generate_content`) |
-| **Parallel Web** | `parallel-web` (v1.3.3+) | [`backend/services/parallel_researcher.py`](backend/services/parallel_researcher.py) (Line 96: `client.search`) |
+| **Google Cloud Gemini** (Stage 1: Screenplay Breakdown) | `google-genai` (v2.22.0+) | [`backend/services/gemini_analyzer.py`](backend/services/gemini_analyzer.py#L50) (Line 50: `client.models.generate_content`) |
+| **Parallel Web Search** (Stage 2: 5 Categories) | `parallel-web` (v1.3.3+) | [`backend/services/parallel_researcher.py`](backend/services/parallel_researcher.py#L131) (Line 131: `client.search`) |
+| **Google Cloud Gemini** (Stage 5: Rewrite Strategist) | `google-genai` (v2.22.0+) | [`backend/services/rewrite_strategist.py`](backend/services/rewrite_strategist.py#L92) (Line 92: `client.models.generate_content`) |
 
 ### Models Used
-- **Gemini**: `gemini-3.6-flash` (with fallback to `gemini-3.5-flash` / `gemini-3.8-flash` on high demand) via Google GenAI API with forced Pydantic JSON schema output (`response_mime_type="application/json"`).
+- **Gemini**: `gemini-3.6-flash` (with automated fallback to `gemini-3.5-flash` / `gemini-3.7-flash` / `gemini-3.8-flash` on high demand) via Google GenAI API with forced Pydantic JSON schema output (`response_mime_type="application/json"`).
 - **Parallel**: Official Parallel Search API (`mode="turbo"`) querying 5 canonical filming categories.
 
 ---
