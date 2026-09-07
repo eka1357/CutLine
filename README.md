@@ -75,17 +75,50 @@ PARALLEL_API_KEY="your-parallel-api-key"
 GEMINI_MODEL="gemini-3.6-flash"
 ```
 
-### 4. Run Developer Verification Test
-```bash
-python tests/run_phase1_test.py
-```
+### 4. Build and Run the Application
 
-### 5. Run Backend API Server
+#### Option A: Unified Self-Contained Server (Production Mode)
+Build the React frontend and run FastAPI (which serves both the API and the Command Center UI at `/`):
 ```bash
-uvicorn backend.main:app --reload --port 8000
+# Build frontend
+cd frontend
+npm install
+npm run build
+cd ..
+
+# Start unified server
+uvicorn backend.main:app --port 8000
 ```
+- Open Command Center: `http://localhost:8000/`
 - Health check: `http://localhost:8000/health`
-- API docs: `http://localhost:8000/docs`
+- Interactive API docs: `http://localhost:8000/docs`
+
+#### Option B: Full-Stack Development Mode
+Run backend and Vite dev server simultaneously:
+```bash
+# Terminal 1: Backend
+uvicorn backend.main:app --reload --port 8000
+
+# Terminal 2: Frontend Vite Dev Server
+cd frontend
+npm run dev
+```
+- Vite Dev Server runs at `http://localhost:3000/` with proxying to port 8000.
+
+---
+
+## Verification & Test Suites
+
+```bash
+# 1. Run 10-Scenario Adversarial Test Suite
+python tests/test_phase2_adversarial.py
+
+# 2. Run Master 5-Stage Live Pipeline Test
+python tests/run_phase2_test.py
+
+# 3. Run FastAPI Endpoint & Static Hosting Verification
+python tests/test_api_endpoint.py
+```
 
 ---
 

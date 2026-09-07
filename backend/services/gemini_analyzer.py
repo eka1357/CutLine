@@ -73,6 +73,8 @@ def analyze_screenplay(screenplay_text: str) -> ScreenplayAnalysisResult:
         except Exception as e:
             logger.warning(f"Model {model_name} failed: {e}")
             last_error = e
+            import time
+            time.sleep(1.2)
 
     raise RuntimeError(
         f"Stage 1 Screenplay Analyzer failed across all attempted models: {last_error}"

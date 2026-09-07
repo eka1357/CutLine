@@ -3,9 +3,12 @@ CutLine FastAPI Application
 Provides endpoints for Phase 1 verification and production planning pipeline.
 """
 
+import os
 import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from backend.config import mask_secret, GEMINI_API_KEY, PARALLEL_API_KEY
 from backend.schemas import (
@@ -98,3 +101,16 @@ def run_production_pipeline(request: PipelineRequest):
     except Exception as e:
         logger.exception("Error executing master production pipeline")
         raise HTTPException(status_code=500, detail=sanitize_error_message(e))
+
+
+# Mount built frontend assets if dist directory exists (Cloud Run single-container support)
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+if os.path.isdir(frontend_dist):
+    assets_dir = os.path.join(frontend_dist, "assets")
+    if os.path.isdir(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/")
+    def serve_frontend_root():
+        """Serves the built CutLine command center frontend."""
+        return FileResponse(os.path.join(frontend_dist, "index.html"))

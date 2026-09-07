@@ -85,7 +85,17 @@ def test_pipeline_run():
     print(" [PASS] /api/pipeline/run returned 200 with full master ProductionPlan!")
 
 
+def test_frontend_root():
+    print("\nTesting GET / (Frontend Static Root) ...")
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "text/html" in response.headers.get("content-type", "")
+    assert "CUTLINE" in response.text
+    print(" [PASS] GET / serves built CutLine command center frontend HTML!")
+
+
 if __name__ == "__main__":
     test_health()
+    test_frontend_root()
     test_phase1_analyze()
     test_pipeline_run()

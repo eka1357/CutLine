@@ -115,6 +115,8 @@ Ensure each alternative includes a concrete screenplay excerpt.
 
         except Exception as e:
             logger.warning(f"Rewrite strategist failed with model {model_name}: {e}")
+            import time
+            time.sleep(1.2)
 
     logger.error(f"Failed to generate alternatives for {decision.scene_id} across all models")
     return []
