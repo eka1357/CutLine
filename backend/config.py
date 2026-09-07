@@ -19,6 +19,7 @@ DEFAULT_GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 FALLBACK_GEMINI_MODELS: list[str] = [
     "gemini-3.6-flash",
     "gemini-3.5-flash",
+    "gemini-3.7-flash",
     "gemini-3.8-flash",
 ]
 

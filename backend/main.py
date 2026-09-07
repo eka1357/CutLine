@@ -39,6 +39,16 @@ app.add_middleware(
 )
 
 
+def sanitize_error_message(err: Exception) -> str:
+    """Ensure raw exceptions never expose API keys or secrets in error responses."""
+    msg = str(err)
+    if GEMINI_API_KEY and GEMINI_API_KEY in msg:
+        msg = msg.replace(GEMINI_API_KEY, mask_secret(GEMINI_API_KEY))
+    if PARALLEL_API_KEY and PARALLEL_API_KEY in msg:
+        msg = msg.replace(PARALLEL_API_KEY, mask_secret(PARALLEL_API_KEY))
+    return msg
+
+
 @app.get("/health")
 def health_check():
     """Health check endpoint confirming API readiness and masked secret presence."""
@@ -67,7 +77,7 @@ def analyze_phase1(request: Phase1Request):
         return response
     except Exception as e:
         logger.exception("Error executing Phase 1 pipeline")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=sanitize_error_message(e))
 
 
 @app.post("/api/pipeline/run", response_model=ProductionPlan)
@@ -87,4 +97,4 @@ def run_production_pipeline(request: PipelineRequest):
         return plan
     except Exception as e:
         logger.exception("Error executing master production pipeline")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=sanitize_error_message(e))

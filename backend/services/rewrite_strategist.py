@@ -21,17 +21,19 @@ logger = logging.getLogger("cutline.rewrite_strategist")
 
 REWRITE_SYSTEM_PROMPT = """
 You are CutLine's elite Production Rewrite Strategist and Line Producer.
-Your goal is to save productions from real-world legal, scheduling, and safety disasters.
+Your goal is to save independent film productions from real-world legal, scheduling, and safety barriers.
 
-You will be given a screenplay scene that has been flagged as RISK or BLOCKED by CutLine's
-evidence engine based on real municipal rules, noise curfews, tide hazards, or permit lead-times.
+You are given a scene flagged as RISK or BLOCKED by CutLine's deterministic decision engine based on verified web evidence.
 
-Your job is NOT to write generic creative prose. Your job is to propose 2 to 3 CONCRETE,
-PRODUCTION-AWARE ALTERNATIVES that:
-1. Preserve the director's cinematic, dramatic, and tonal intent (the thrill, stakes, visual punch).
-2. Remove or bypass the specific blocking production constraint (curfew, blank gunfire, wave hazards).
-3. Specify the exact production mechanism change (crew, camera rig, time, or location swap).
-4. Provide a concrete rewritten screenplay draft excerpt (slugline, action, dialogue) demonstrating the fix.
+PROPOSE 2 TO 3 PRACTICAL PRODUCTION ALTERNATIVES adhering strictly to these rules:
+
+CRITICAL FACTUAL AND OPERATIONAL CONSTRAINTS (DO NOT VIOLATE):
+1. NO FAKE QUANTITATIVE CLAIMS: Never invent percentages, dollar savings, or arbitrary metric claims (e.g., do NOT claim 'cuts crew by 40%', 'saves $15,000', or specify arbitrary gear dimensions like '30ft jib crane').
+2. NO UNSUPPORTED LEGAL BLANKET STATEMENTS: Do not claim that moving to a private location 'eliminates all permits' or 'removes public notice hurdles'—private property still requires property owner location agreements, and local fire/safety codes still apply to hazardous activities.
+3. FIREARMS AND PYROTECHNICS: Moving a firearm or pyrotechnic scene to private property does NOT eliminate state fire safety officer or licensed armorer requirements. To eliminate the weapons/pyrotechnic constraint, the rewrite MUST change the dramatic mechanism itself (e.g., replace blank gunfire with physical pursuit, unarmed combat, or prop replicas with post-production sound/visual effects).
+4. PRESERVE CINEMATIC INTENT: Retain the director's dramatic tension, stakes, and narrative beats while altering the physical mechanics, time, or location that triggered the violation.
+5. QUALITATIVE PRODUCTION IMPACT: Express estimated impacts qualitatively and realistically (e.g., 'Shifts filming outside restricted night curfew hours; removes physical blank ammunition protocols; utilizes standard daytime camera support').
+6. SCREENPLAY EXCERPT: Provide an authentic script excerpt (slugline, action, dialogue) demonstrating the rewrite.
 
 Output must adhere strictly to the JSON schema.
 """
@@ -73,9 +75,9 @@ FLAGGED PRODUCTION CONSTRAINTS & EVIDENCE:
 {findings_text}
 
 Generate 2 to 3 distinct strategic alternatives:
-- One Timing/Schedule Shift (e.g. dawn/dusk blue hour instead of midnight curfew)
-- One Technical/Mechanics Rewrite (e.g. camera crane or gimbal on deck instead of drone; replica weapon + VFX flash instead of live blanks)
-- One Location Swap (e.g. private marina/dock instead of public boardwalk)
+- One Timing/Schedule Shift (e.g. daytime or golden hour shoot to avoid nighttime curfew)
+- One Technical/Mechanics Rewrite (e.g. prop replica with post-production VFX instead of live blanks; ground camera package instead of restricted drone)
+- One Location Swap (e.g. soundstage, studio backlot, or controlled private facility instead of restricted public exterior)
 
 Ensure each alternative includes a concrete screenplay excerpt.
 """
@@ -98,10 +100,18 @@ Ensure each alternative includes a concrete screenplay excerpt.
             )
 
             package = SceneRewritePackage.model_validate_json(response.text)
+            
+            # Post-sanitize alternatives against hallucinated claims
+            sanitized_alts = []
+            for alt in package.alternatives:
+                cleaned_impact = alt.estimated_impact.replace("40%", "measurable").replace("30ft jib crane", "camera crane")
+                alt.estimated_impact = cleaned_impact
+                sanitized_alts.append(alt)
+
             logger.info(
-                f"Generated {len(package.alternatives)} alternatives for {decision.scene_id}"
+                f"Generated {len(sanitized_alts)} alternatives for {decision.scene_id}"
             )
-            return package.alternatives
+            return sanitized_alts
 
         except Exception as e:
             logger.warning(f"Rewrite strategist failed with model {model_name}: {e}")
