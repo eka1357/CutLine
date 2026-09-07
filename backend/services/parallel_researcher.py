@@ -68,7 +68,16 @@ def extract_claims_from_excerpt(
         if len(cleaned) < 25:
             continue
 
-        claim_text = cleaned if len(cleaned) <= 320 else cleaned[:317] + "..."
+        # Extract a concise, complete claim sentence for the claim field
+        sentences = re.split(r"(?<=[.!?])\s+", cleaned)
+        first_sentence = sentences[0].strip() if sentences else cleaned
+        if 25 <= len(first_sentence) <= 220:
+            claim_text = first_sentence
+        elif len(cleaned) <= 220:
+            claim_text = cleaned
+        else:
+            claim_text = cleaned[:217] + "..."
+
         facts.append(
             ResearchFact(
                 claim=claim_text,

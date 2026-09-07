@@ -8,14 +8,20 @@ const STAGES = [
   { id: 5, name: 'Stage 5: Rewrite Strategist', agent: 'Gemini 3.6 Flash (google-genai)', desc: 'Generating actionable production rewrites for flagged scenes' },
 ]
 
-export default function PipelineProgress({ loading }) {
+export default function PipelineProgress({ loading, completed }) {
   const [currentStage, setCurrentStage] = useState(1)
 
   useEffect(() => {
     if (!loading) {
-      setCurrentStage(1)
+      if (completed) {
+        setCurrentStage(6)
+      } else {
+        setCurrentStage(1)
+      }
       return
     }
+
+    setCurrentStage(1)
 
     // Progression timer to reflect live pipeline execution phases
     const timer1 = setTimeout(() => setCurrentStage(2), 2500)
@@ -29,21 +35,27 @@ export default function PipelineProgress({ loading }) {
       clearTimeout(timer3)
       clearTimeout(timer4)
     }
-  }, [loading])
+  }, [loading, completed])
 
-  if (!loading) return null
+  if (!loading && !completed) return null
+
+  const isAllComplete = !loading && completed
 
   return (
     <div className="pipeline-progress">
       <div className="card-title">
-        <span>Autonomous Agent Pipeline Active</span>
-        <span className="badge-tag cyan">STAGE {currentStage} OF 5</span>
+        <span>{isAllComplete ? 'Autonomous Agent Pipeline Complete' : 'Autonomous Agent Pipeline Active'}</span>
+        {isAllComplete ? (
+          <span className="badge-tag highlight">ALL 5 STAGES VERIFIED</span>
+        ) : (
+          <span className="badge-tag cyan">STAGE {currentStage} OF 5</span>
+        )}
       </div>
 
       <div className="stage-list">
         {STAGES.map((s) => {
           const isCompleted = currentStage > s.id
-          const isActive = currentStage === s.id
+          const isActive = currentStage === s.id && !isAllComplete
 
           return (
             <div
@@ -57,7 +69,7 @@ export default function PipelineProgress({ loading }) {
                   {isActive && <span className="pulse-indicator"></span>}
                 </div>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  {s.agent} — {s.desc}
+                  {s.agent} / {s.desc}
                 </span>
               </div>
             </div>

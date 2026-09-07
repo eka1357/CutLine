@@ -114,3 +114,11 @@ if os.path.isdir(frontend_dist):
     def serve_frontend_root():
         """Serves the built CutLine command center frontend."""
         return FileResponse(os.path.join(frontend_dist, "index.html"))
+
+    @app.get("/cutline.svg")
+    def serve_cutline_favicon():
+        """Serves the CutLine SVG favicon."""
+        svg_path = os.path.join(frontend_dist, "cutline.svg")
+        if os.path.isfile(svg_path):
+            return FileResponse(svg_path, media_type="image/svg+xml")
+        raise HTTPException(status_code=404, detail="Favicon not found")

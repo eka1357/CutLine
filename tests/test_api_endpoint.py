@@ -94,8 +94,18 @@ def test_frontend_root():
     print(" [PASS] GET / serves built CutLine command center frontend HTML!")
 
 
+def test_cutline_svg():
+    print("\nTesting GET /cutline.svg (Favicon Endpoint) ...")
+    response = client.get("/cutline.svg")
+    assert response.status_code == 200
+    assert "image/svg+xml" in response.headers.get("content-type", "")
+    assert "<svg" in response.text
+    print(" [PASS] GET /cutline.svg serves CutLine branded SVG favicon!")
+
+
 if __name__ == "__main__":
     test_health()
     test_frontend_root()
+    test_cutline_svg()
     test_phase1_analyze()
     test_pipeline_run()

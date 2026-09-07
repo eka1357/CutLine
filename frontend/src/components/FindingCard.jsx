@@ -20,7 +20,7 @@ export default function FindingCard({ finding, onOpenEvidence }) {
 
       <p className="finding-reason">{finding.reason}</p>
 
-      {finding.supporting_evidence && finding.supporting_evidence.length > 0 && (
+      {finding.supporting_evidence?.length > 0 && (
         <div className="evidence-tags">
           {finding.supporting_evidence.map((ev, idx) => (
             <button

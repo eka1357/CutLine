@@ -6,6 +6,7 @@ while eliminating the blocking constraint.
 """
 
 import logging
+import re
 from google import genai
 from google.genai import types
 
@@ -17,6 +18,24 @@ from backend.schemas import (
 )
 
 logger = logging.getLogger("cutline.rewrite_strategist")
+
+
+def sanitize_estimated_impact(text: str) -> str:
+    """
+    Sanitize estimated impact against hallucinated quantitative claims
+    (percentages, dollar amounts, and arbitrary gear dimensions).
+    """
+    # Replace numeric percentage claims e.g. 40%, 25 % with 'measurable margin'
+    cleaned = re.sub(r"\b\d+%\b|\b\d+\s*percent\b", "measurable margin", text, flags=re.IGNORECASE)
+    # Replace specific dollar amounts e.g. $15,000, $500 with 'budgetary resources'
+    cleaned = re.sub(r"\$[\d,]+(?:\.\d+)?", "budgetary resources", cleaned)
+    # Replace specific gear dimension claims e.g. '30ft jib crane', '20-foot crane', '15m boom'
+    cleaned = re.sub(r"\b\d+\s*(?:-| )(?:ft|foot|feet|meter|metre)s?\b", "standard", cleaned, flags=re.IGNORECASE)
+    # Replace explicit jib crane dimensions
+    cleaned = re.sub(r"\b\d+\s*ft\s+jib\s+crane\b", "camera crane", cleaned, flags=re.IGNORECASE)
+    # Clean up whitespace
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned
 
 
 REWRITE_SYSTEM_PROMPT = """
@@ -101,11 +120,10 @@ Ensure each alternative includes a concrete screenplay excerpt.
 
             package = SceneRewritePackage.model_validate_json(response.text)
             
-            # Post-sanitize alternatives against hallucinated claims
+            # Post-sanitize alternatives against hallucinated quantitative claims
             sanitized_alts = []
             for alt in package.alternatives:
-                cleaned_impact = alt.estimated_impact.replace("40%", "measurable").replace("30ft jib crane", "camera crane")
-                alt.estimated_impact = cleaned_impact
+                alt.estimated_impact = sanitize_estimated_impact(alt.estimated_impact)
                 sanitized_alts.append(alt)
 
             logger.info(

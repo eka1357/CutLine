@@ -479,19 +479,7 @@ body {
   background: var(--bg-canvas);
   padding: 12px 14px;
   border-radius: var(--radius-sm);
-  border-left: 3px solid var(--border-strong);
-}
-
-.scene-summary-box.GO {
-  border-left-color: var(--status-go);
-}
-
-.scene-summary-box.RISK {
-  border-left-color: var(--status-risk);
-}
-
-.scene-summary-box.BLOCKED {
-  border-left-color: var(--status-blocked);
+  border: 1px solid var(--border-subtle);
 }
 
 /* Findings List */

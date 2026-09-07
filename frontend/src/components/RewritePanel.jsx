@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 export default function RewritePanel({ alternatives }) {
-  if (!alternatives || alternatives.length === 0) return null
+  if (!alternatives?.length) return null
 
   const [activeTab, setActiveTab] = useState(0)
   const currentAlt = alternatives[activeTab] || alternatives[0]
@@ -14,8 +14,10 @@ export default function RewritePanel({ alternatives }) {
         return 'Technical / Mechanics Rewrite'
       case 'location_swap':
         return 'Location Swap'
+      case 'procedural_mitigation':
+        return 'Procedural Mitigation'
       default:
-        return type.replace('_', ' ')
+        return type ? type.replace(/_/g, ' ') : ''
     }
   }
 

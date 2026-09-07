@@ -1,6 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 export default function EvidenceDrawer({ evidence, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   if (!evidence) return null
 
   return (
@@ -20,7 +28,7 @@ export default function EvidenceDrawer({ evidence, onClose }) {
 
         <div className="evidence-fact-card">
           <div className="fact-category">
-            CATEGORY: {evidence.category ? evidence.category.replace('_', ' ') : 'RESEARCH FACT'}
+            CATEGORY: {evidence.category ? evidence.category.replace(/_/g, ' ') : 'RESEARCH FACT'}
           </div>
 
           <div className="fact-claim">

@@ -58,7 +58,7 @@ export default function App() {
             loading={loading}
           />
 
-          <PipelineProgress loading={loading} />
+          <PipelineProgress loading={loading} completed={!!plan} />
         </div>
 
         {/* Right Column: Interactive Command Center Timeline */}

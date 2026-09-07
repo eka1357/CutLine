@@ -11,7 +11,7 @@ export default function Header({ health }) {
           <span className="badge-tag highlight">PARALLEL TRACK</span>
         </h1>
         <p className="brand-tagline">
-          Autonomous Production-Planning Agent — Reality-Testing Screenplays via Live Parallel Search & Gemini
+          Autonomous Production-Planning Agent / Reality-Testing Screenplays via Live Parallel Search & Gemini
         </p>
       </div>
 
