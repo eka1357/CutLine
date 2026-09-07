@@ -10,6 +10,8 @@ export const PRESETS = {
     shoot_start_date: "2026-07-10",
     shoot_end_date: "2026-07-15",
     budget: 75000,
+    production_type: "Independent Feature",
+    crew_size: "Medium (11-30 crew)",
     description: "Coastal neo-noir: diner dialogue (clean GO) followed by late-night public pier pursuit with blank gunfire, drone tracking, and tide surge (RISK / BLOCKED).",
     screenplay: `TITLE: NEON DRIFTWOOD
 WRITER: CUTLINE ORIGINAL SCREENPLAY
@@ -60,6 +62,8 @@ The Courier slips on the algae-slick planks, dropping the metal briefcase. It sk
     shoot_start_date: "2026-10-10",
     shoot_end_date: "2026-10-15",
     budget: 95000,
+    production_type: "Commercial / Brand",
+    crew_size: "Small (1-10 crew)",
     description: "Architectural thriller: Harold Washington Library interior (GO) followed by midnight Chicago Riverwalk chase during marathon route setup (BLOCKED / RISK).",
     screenplay: `TITLE: THE LAKEFRONT CIPHER
 WRITER: CUTLINE ORIGINAL SCREENPLAY
@@ -94,5 +98,52 @@ Fifty feet behind, TWO OPERATIVES in dark raincoats descend rapidly.
 Evan ducks behind a massive concrete bridge abutment as a drone searchlight sweeps across the pedestrian walkway.
 
 Heavy footsteps echo on the concrete. Evan grips a stainless steel lockbox, peering into the dark water. The water laps against the retaining wall just inches below the promenade edge.`,
+  },
+
+  empire_lockdown: {
+    title: "Empire Lockdown",
+    location: "New York, NY",
+    shoot_start_date: "2026-09-18",
+    shoot_end_date: "2026-09-22",
+    budget: 120000,
+    production_type: "Independent Feature",
+    crew_size: "Standard (31-60 crew)",
+    description: "Urban action thriller: Tribeca cast-iron loft interior (GO) followed by midnight Brooklyn Bridge pedestrian promenade pursuit with drone camera and blank gunfire during high-security UN week closures (BLOCKED / RISK).",
+    screenplay: `TITLE: EMPIRE LOCKDOWN
+WRITER: CUTLINE ORIGINAL SCREENPLAY
+
+SCENE 1:
+INT. TRIBECA INDUSTRIAL LOFT - DAY
+
+Cast-iron columns flank high floor-to-ceiling loft windows overlooking cobblestone streets.
+NINA MORALES (30s, distressed leather coat) rapidly unrolls architectural transit schematics across a stainless steel prep island. 
+MARCUS FINCH (40s, dark turtleneck) leans against a butcher block counter, sipping espresso.
+
+MARCUS
+The UN delegates arrive Monday morning. Every transit artery south of 59th Street will be restricted by federal security details.
+
+NINA
+We're not crossing midtown. The optical relay is housed in the anchor vault beneath the bridge anchorage.
+
+MARCUS
+The pedestrian promenade has automated NYPD surveillance towers every hundred yards. You can't stage equipment without immediate police intervention.
+
+NINA
+We move at midnight during the shift change. Ten minutes on the walkway, then we slip into the subway conduit.
+
+
+SCENE 2:
+EXT. BROOKLYN BRIDGE WALKWAY - NIGHT
+
+12:30 AM. Howling wind whips across the East River suspension cables. Rain slicks the elevated wooden pedestrian promenade.
+A DRONE CAMERA swoops low through the gothic stone arches, tracking Nina as she sprints past steel tension cables.
+
+Two Port Authority officers shout into megaphones from the roadway below. 
+A bright xenon searchlight illuminates Nina as she reaches the mid-span tower. 
+
+Down the wooden walkway, a PURSUER in a yellow slicker levels an automatic handgun. 
+GUNFIRE resonates across the river span—simulated blank gunfire echoes against the granite masonry towers.
+
+Nina drops low, vaulting over a construction safety barricade onto the bicycle lane below.`,
   },
 }

@@ -17,6 +17,8 @@ export default function App() {
     shoot_start_date: PRESETS.neon_driftwood.shoot_start_date,
     shoot_end_date: PRESETS.neon_driftwood.shoot_end_date,
     budget: PRESETS.neon_driftwood.budget,
+    production_type: PRESETS.neon_driftwood.production_type || 'Independent Feature',
+    crew_size: PRESETS.neon_driftwood.crew_size || 'Medium (11-30 crew)',
   })
 
   const [loading, setLoading] = useState(false)

@@ -20,13 +20,15 @@ export async function fetchHealth() {
   }
 }
 
-export async function runProductionPipeline({ screenplay, location, shoot_start_date, shoot_end_date, budget }) {
+export async function runProductionPipeline({ screenplay, location, shoot_start_date, shoot_end_date, budget, production_type, crew_size }) {
   const payload = {
     screenplay,
     location,
     shoot_start_date,
     shoot_end_date,
     budget: Number(budget) || 50000,
+    production_type: production_type || "Independent Feature",
+    crew_size: crew_size || "Medium (11-30 crew)",
   }
 
   const controller = new AbortController()

@@ -143,6 +143,8 @@ def run_complete_pipeline(
         location=request.location,
         shoot_window=f"{request.shoot_start_date} to {request.shoot_end_date}",
         budget=request.budget,
+        production_type=getattr(request, "production_type", "Independent Feature") or "Independent Feature",
+        crew_size=getattr(request, "crew_size", "Medium (11-30 crew)") or "Medium (11-30 crew)",
         overall_decision=overall_decision,
         decision_counts=decision_counts,
         scenes=scene_decisions,

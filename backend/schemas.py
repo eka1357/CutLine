@@ -3,7 +3,7 @@ Pydantic Schemas for CutLine
 Defines strict data models for Screenplay Analysis, Parallel Web Research, and Phase 1 API.
 """
 
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -299,6 +299,14 @@ class ProductionPlan(BaseModel):
     location: str
     shoot_window: str
     budget: float
+    production_type: Optional[str] = Field(
+        default="Independent Feature",
+        description="Production scale category (e.g., 'Independent Feature', 'Commercial', 'Student / Micro-Budget')."
+    )
+    crew_size: Optional[str] = Field(
+        default="Medium (11-30 crew)",
+        description="Estimated crew footprint tier."
+    )
     overall_decision: DecisionStatusType = Field(
         description="Worst-case roll-up: BLOCKED if any scene blocked; RISK if any scene risky; else GO."
     )
@@ -352,6 +360,14 @@ class Phase1Request(BaseModel):
         ...,
         ge=0.0,
         description="Total proposed production budget in USD."
+    )
+    production_type: Optional[str] = Field(
+        default="Independent Feature",
+        description="Production scale category (e.g., 'Independent Feature', 'Commercial', 'Student / Micro-Budget')."
+    )
+    crew_size: Optional[str] = Field(
+        default="Medium (11-30 crew)",
+        description="Estimated crew footprint tier."
     )
 
 
