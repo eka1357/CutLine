@@ -877,3 +877,106 @@ body {
 .fact-link:hover {
   text-decoration: underline;
 }
+
+/* Live Pipeline Step Detail */
+.stage-live-detail {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-cyan);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  animation: fadeInStep 0.25s ease-out;
+}
+
+@keyframes fadeInStep {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stage-item.completed .stage-live-detail {
+  color: var(--text-muted);
+}
+
+/* Empty State: Pipeline Architecture Diagram */
+.empty-state-container {
+  padding: 28px 24px;
+}
+
+.empty-state-pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 4px 0;
+}
+
+.empty-stage-node {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s ease;
+}
+
+.empty-stage-node:hover {
+  border-color: var(--border-strong);
+}
+
+.empty-stage-icon {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.empty-stage-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.empty-stage-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.empty-stage-engine {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.empty-stage-connector {
+  display: flex;
+  justify-content: center;
+  padding: 2px 0;
+}
+
+.empty-stage-connector svg {
+  transform: rotate(90deg);
+}
+
+.empty-state-categories {
+  padding-top: 4px;
+}
+
+.empty-state-output {
+  padding-top: 4px;
+}
+

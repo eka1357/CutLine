@@ -103,9 +103,67 @@ def test_cutline_svg():
     print(" [PASS] GET /cutline.svg serves CutLine branded SVG favicon!")
 
 
+def test_pipeline_stream_sse():
+    print("\nTesting POST /api/pipeline/stream (SSE Streaming Endpoint with mock) ...")
+    from unittest.mock import patch
+    from backend.schemas import ProductionPlan, SceneProductionDecision
+
+    mock_plan = ProductionPlan(
+        project_title="Neon Driftwood",
+        location=TEST_LOCATION,
+        shoot_window=f"{TEST_START_DATE} to {TEST_END_DATE}",
+        budget=TEST_BUDGET,
+        overall_decision="GO",
+        decision_counts={"GO": 1, "RISK": 0, "BLOCKED": 0},
+        scenes=[
+            SceneProductionDecision(
+                scene_id="SCENE_1",
+                heading="INT. DINER - NIGHT",
+                interior_exterior="INT",
+                time_of_day="NIGHT",
+                setting="diner",
+                requirements=["Dialogue"],
+                shoot_implications="Standard indoor dialogue",
+                decision="GO",
+                decision_summary="Clean interior scene with no exterior constraints.",
+                findings=[],
+                attached_evidence=[],
+                alternatives=[],
+            )
+        ],
+        all_evidence=[],
+        research_stats={"permits_regulations": 1},
+    )
+
+    def fake_run_pipeline(req, step_callback=None):
+        if step_callback:
+            step_callback("STAGE 1: SCREENPLAY BREAKDOWN (Gemini 3.6 Flash)")
+            step_callback("STAGE 2: PARALLEL WEB RESEARCH (Official parallel-web SDK)")
+        return mock_plan
+
+    with patch("backend.main.run_complete_pipeline", side_effect=fake_run_pipeline):
+        payload = {
+            "screenplay": NEON_DRIFTWOOD_SCREENPLAY,
+            "location": TEST_LOCATION,
+            "shoot_start_date": TEST_START_DATE,
+            "shoot_end_date": TEST_END_DATE,
+            "budget": TEST_BUDGET,
+        }
+        with client.stream("POST", "/api/pipeline/stream", json=payload) as response:
+            assert response.status_code == 200
+            assert "text/event-stream" in response.headers.get("content-type", "")
+
+            lines = list(response.iter_lines())
+            assert any("event: step" in l for l in lines)
+            assert any("event: complete" in l for l in lines)
+            print(" [PASS] POST /api/pipeline/stream streams SSE events and completes successfully!")
+
+
 if __name__ == "__main__":
     test_health()
     test_frontend_root()
     test_cutline_svg()
+    test_pipeline_stream_sse()
     test_phase1_analyze()
     test_pipeline_run()
+

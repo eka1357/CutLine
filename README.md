@@ -4,8 +4,22 @@
 
 CutLine turns a screenplay into a production plan that can survive reality. It investigates real-world constraints around a proposed shoot location and date window using live web research via **Parallel Search**, and maps those findings to individual screenplay requirements using **Gemini on Google Cloud** and a **deterministic production decision engine**.
 
-- **Live Application (Cloud Run):** [CutLine Production Service](https://cutline-a7caab89-uc.a.run.app) *(or your deployed Cloud Run URL)*
-- **Demo Video:** [CutLine Walkthrough & Architecture Demo](https://youtu.be/cutline-demo)
+- **Live Application (Cloud Run):** *[Update with your deployed Cloud Run URL]*
+- **Demo Video:** *[Update with your YouTube demo URL]*
+
+---
+
+## The Problem CutLine Solves
+
+Independent producers commit money and crew schedules before discovering that their shoot location has a permit lead-time they can't meet, a festival that closes the streets they need, or a noise curfew that blocks their night exterior. Discovering these late costs real money and real time.
+
+**Concrete example:** A producer plans a 3-day exterior shoot on the Santa Monica Pier starting July 10. Without CutLine, they might not discover until arrival that:
+
+- The City of Santa Monica requires commercial filming applications submitted 10+ business days in advance, with mandatory police and fire coordination
+- The Independence Day holiday aftermath and summer festival season create partial pier closures and crowd conflicts during their window
+- High surf advisories are historically common on the Southern California coast in mid-July, introducing equipment and actor safety hazards on the pier deck
+
+CutLine surfaces all of these before a single dollar is spent on travel, crew, or equipment rental. Each finding is backed by a verifiable source URL from live Parallel Search, and flagged scenes receive concrete rewrite alternatives that preserve the director's cinematic intent.
 
 ---
 
