@@ -4,7 +4,7 @@
 
 CutLine turns a screenplay into a production plan that can survive reality. It investigates real-world constraints around a proposed shoot location and date window using live web research via **Parallel Search**, and maps those findings to individual screenplay requirements using **Gemini on Google Cloud** and a **deterministic production decision engine**.
 
-- **Live Application (Cloud Run):** *[Update with your deployed Cloud Run URL]*
+- **Live Application:** [https://cutline-27fg.onrender.com/](https://cutline-27fg.onrender.com/)
 - **Demo Video:** *[Update with your YouTube demo URL]*
 
 ---

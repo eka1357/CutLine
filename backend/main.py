@@ -79,7 +79,7 @@ def _parse_stage_from_message(msg: str) -> int:
     return 0
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health_check():
     """Health check endpoint confirming API readiness and masked secret presence."""
     return {
@@ -193,7 +193,7 @@ if os.path.isdir(frontend_dist):
     if os.path.isdir(assets_dir):
         app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
-    @app.get("/")
+    @app.api_route("/", methods=["GET", "HEAD"])
     def serve_frontend_root():
         """Serves the built CutLine command center frontend."""
         return FileResponse(os.path.join(frontend_dist, "index.html"))
